@@ -2,23 +2,23 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "blog",
+  title: "Zaler's Blog",
   description: "a blog of writing",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/notes/markdown-examples' },
+      { text: '文章', link: '/note/ubuntu 核显直通' },
     ],
 
     sidebar: [
       {
-        text: 'Examples',
+        text: '文章',
         items: [
-          { text: 'Markdown Examples', link: '/notes/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/notes/api-examples' },
-          { text: 'Mac mini 外置磁盘升级系统', link: '/notes/updateMacOS' },
-          { text: 'Ubuntu核显直通', link: '/notes/ubuntu 核显直通' }
+          { text: 'Ubuntu 核显直通', link: '/note/ubuntu 核显直通' },
+          { text: 'Markdown Examples', link: '/note/markdown-examples' },
+          { text: 'Runtime API Examples', link: '/note/api-examples' },
+          { text: 'Mac mini 外置磁盘升级系统', link: '/note/updateMacOS' },
         ]
       }
     ],

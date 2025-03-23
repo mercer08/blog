@@ -8,18 +8,18 @@ hero:
   tagline: A ship in harbor is safe but that is not what ships are.
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /notes/markdown-examples
+      text: 文章
+      link: /note/ubuntu 核显直通
     - theme: alt
-      text: API Examples
-      link: //notesapi-examples
+      text: 关于我
+      link: https://github.com/mercer08
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 前端
+    details: Javascript, React, Vue, Vite, NodeJs
+  - title: 家庭服务折腾
+    details: PVE, ikuai, iStoreOS, Ubuntu, Docker
+  - title: 随想
+    details: 力量训练，投资，新闻，社会观察
 ---
 
