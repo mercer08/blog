@@ -36,10 +36,9 @@ sudo apt install -y git build-* dkms # 必要编译工具安装
 # 可选
 sudo apt install -y vim
 ```
-#### 设置环境变量
+#### 编辑器 grub 配置
 ```bash
-KERNEL=$(uname -r); KERNEL=${KERNEL%-generic}
-echo ${KERNEL}
+sudo nano /etc/default/grub
 ```
 
 ## 参考
