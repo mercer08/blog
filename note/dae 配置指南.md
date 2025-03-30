@@ -48,7 +48,7 @@ global {
     allow_insecure: false
     check_interval: 30s
     check_tolerance: 50ms
-    # lan_interface: 网卡名称
+    lan_interface: ens18
     wan_interface: auto
     udp_check_dns:'dns.google.com:53,8.8.8.8,2001:4860:4860::8888'
     tcp_check_url: 'http://cp.cloudflare.com,1.1.1.1,2606:4700:4700::1111'
@@ -57,14 +57,19 @@ global {
     disable_waiting_network: true
     auto_config_kernel_parameter: true
     sniffing_timeout: 100ms
-    tls_implementation: tls
+    tls_implementation: utls
     utls_imitate: chrome_auto
     tproxy_port_protect: true
     so_mark_from_dae: 0
 }
 
 subscription {
-    my_sub: '你的订阅地址'
+    # my_sub: '订阅地址'
+}
+
+node {
+  # sing box inbound port
+  'socks5://localhost:1080'
 }
 
 dns {
@@ -78,9 +83,8 @@ dns {
     request {
       # 对于中国大陆域名使用 alidns，其他使用 googledns 查询。
       qname(geosite:cn) -> alidns
-      # 属于广告的一些解析，全拒绝解析
-      qname(geosite:category-ads) -> reject
-      qname(geosite:category-ads-all) -> reject
+      qname(geosite:category-ads) -> block
+      qname(geosite:category-ads-all) -> block
       # fallback 意为 default。
       fallback: googledns
     }
@@ -88,44 +92,23 @@ dns {
 }
 
 group {
-    proxy {
-        policy: min_moving_avg
-        filter: subtag(my_sub) && name(keyword: '香港家宽')
-    }
-
-    sg {
-        policy: min_moving_avg
-        filter: subtag(my_sub) && name(keyword: '新加坡家宽')
-    }
+  elden_proxy {
+    policy: fixed(0)
+  }
 }
 
 routing {
     pname(NetworkManager) -> direct
     dip(224.0.0.0/3, 'ff00::/8') -> direct
-    dscp(4) -> direct
-
     dip(geoip:private) -> direct
-    
-    ### OpenAI
-    domain(geosite:openai) -> proxy
-
+    dip(geoip:cn) -> direct
+    domain(geosite:china-list) -> direct
+    domain(geosite:cn) -> direct
     ### AppleCN
     domain(geosite:apple@cn) -> direct
 
-    ### SteamCN
-    domain(geosite:steam@cn) -> direct
-
-    ### telegram
-    dip(geoip:telegram) -> proxy
-
     ### WX DOMAIN
     domain(geosite:tencent) -> direct
-
-    ### Github
-    domain(geosite:github) -> proxy
-
-    ### Docker
-    domain(geosite:docker) -> proxy
 
     ### DIRECT MACHINE
     # mac("BC:24:11:XX:XX:XX") -> direct
@@ -143,12 +126,10 @@ routing {
 
     ### 禁用Quic，避免CPU高负载及内存泄露
     l4proto(udp) && dport(443) -> block
-    domain(geosite:geolocation-!cn) -> proxy
-    dip(geoip:cn) -> direct
-    domain(geosite:china-list) -> direct
-    domain(geosite:cn) -> direct
 
-    fallback: proxy
+    pname(sing-box) -> must_direct
+    
+    fallback: elden_proxy
 }
 ```
 ### 需要注意的部分：
@@ -269,6 +250,65 @@ systemctl start update-dae-subs.service
 l4proto(udp) && dport(443) -> block
 ```
 同时建议添加机场节点域名至Direct规则内，避免回环产生的内存泄露。
+
+
+## 下游 sing-box 配置
+```json
+{
+    "inbounds": [
+        {
+            "type": "socks",
+            "tag": "socks-in",
+            "listen": "::",
+            "listen_port": 1080,
+            "tcp_fast_open": true,
+            "tcp_multi_path": false,
+            "udp_fragment": true,
+            "sniff": false,
+            "sniff_override_destination": false,
+            "sniff_timeout": "300ms",
+            "udp_timeout": 300
+        }
+    ],
+    "outbounds": [
+      {
+            "tag": "proxy",
+            "type": "selector",
+            "outbounds": [
+                "auto",
+                "direct",
+                "日本实验性 IEPL 中继 1",
+                
+            ]
+        },
+      {
+            "tag": "日本实验性 IEPL 中继 1",
+            "type": "trojan",
+            "server": "xxx",
+            "server_port": xxx,
+            "password": "xxx",
+            "tls": {
+                "enabled": true,
+                "server_name": "m.ctrip.com",
+                "insecure": true
+            }
+        },
+    ],
+    "route": {
+        "auto_detect_interface": true,
+        "final": "proxy"
+    },
+    "experimental": {
+        "clash_api": {
+            "external_controller": "0.0.0.0:9090",
+            "external_ui": "metacubexd",
+            "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+            "external_ui_download_detour": "select",
+            "default_mode": "rule"
+        }
+    }
+}
+```
 
 
 ## 参考链接
