@@ -78,6 +78,9 @@ dns {
     request {
       # 对于中国大陆域名使用 alidns，其他使用 googledns 查询。
       qname(geosite:cn) -> alidns
+      # 属于广告的一些解析，全拒绝解析
+      qname(geosite:category-ads) -> reject
+      qname(geosite:category-ads-all) -> reject
       # fallback 意为 default。
       fallback: googledns
     }
