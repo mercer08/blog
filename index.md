@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: 文章
-      link: /note/ubuntu 核显直通
+      link: /note/dae 配置指南
     - theme: alt
       text: 关于我
       link: https://github.com/mercer08

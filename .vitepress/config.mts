@@ -8,13 +8,14 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: '文章', link: '/note/ubuntu 核显直通' },
+      { text: '文章', link: '/note/dae 配置指南' },
     ],
 
     sidebar: [
       {
         text: '文章',
         items: [
+          { text: 'Dae 配置指南', link: '/note/dae 配置指南' },
           { text: 'Ubuntu 核显直通', link: '/note/ubuntu 核显直通' },
           { text: 'Markdown Examples', link: '/note/markdown-examples' },
           { text: 'Runtime API Examples', link: '/note/api-examples' },
