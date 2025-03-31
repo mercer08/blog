@@ -1,4 +1,4 @@
-# 旁路由Debian + Dae + sing-box 配置指南
+# 旁路由Debian + Dae + Sing-box 配置指南
 
 
 ## 系统环境
