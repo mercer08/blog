@@ -1,4 +1,4 @@
-# 旁路由Debian + Dae 配置指南
+# 旁路由Debian + Dae + sing-box 配置指南
 
 
 ## 系统环境
@@ -152,97 +152,6 @@ systemctl 启用 \
 修改配置文件后，需要重载Dae配置文件时，可以使用: 
 `/usr/local/bin/dae reload`
 
-## Dae自动更新并存储订阅
-由于Dae每次启动时均需要重新读取订阅信息，本身并不存取订阅信息，当订阅链接被墙或者无法访问时，就无法正常获取到订阅信息及分组信息，造成访问异常。以下方法可以实现订阅信息存储和自动订阅更新。
-### systemd.timer方法
-假设你的dae配置文件存储于`/usr/local/etc/dae/` ，这也是通过自动安装脚本默认的存储位置。那么新建一个`/usr/local/bin/update-dae-subs.sh`文件:
-```bash
-#!/bin/bash
-
-# Change the path to suit your needs
-cd /usr/local/etc/dae || exit 1
-version="$(dae --version | head -n 1 | sed 's/dae version //')"
-UA="dae/${version} (like v2rayA/1.0 WebRequestHelper) (like v2rayN/1.0 WebRequestHelper)"
-fail=false
-
-while IFS=':' read -r name url
-do
-        curl --retry 3 --retry-delay 5 -fL -A "$UA" "$url" -o "${name}.sub.new"
-        if [[ $? -eq 0 ]]; then
-                mv "${name}.sub.new" "${name}.sub"
-                chmod 0600 "${name}.sub"
-                echo "Downloaded $name"
-        else
-                if [ -f "${name}.sub.new" ]; then
-                        rm "${name}.sub.new"
-                fi
-                fail=true
-                echo "Failed to download $name"
-        fi
-done < sublist
-
-dae reload
-
-if $fail; then
-        echo "Failed to update some subs"
-        exit 2
-fi
-```
-赋予这个文件可执行权限：
-```shell
-chmod +x /usr/local/bin/update-dae-subs.sh
-```
-配置 `systemd.timer` 和 `systemd.service` 进行自动更新
-  - `/etc/systemd/system/update-subs.timer`: 以下代码是每12小时，或者每次系统启动后15分钟更新
-    ```shell
-    [Unit]
-    Description=Auto-update dae subscriptions
-
-    [Timer]
-    OnBootSec=15min
-    OnUnitActiveSec=12h
-
-    [Install]
-    WantedBy=timers.target
-    ```
-  - /etc/systemd/system/update-subs.service:
-    ```shell
-    [Unit]
-    Description=Update dae subscriptions
-    Wants=network-online.target
-    After=network-online.target
-
-    [Service]
-    Type=oneshot
-    ExecStart=/usr/local/bin/update-dae-subs.sh
-    Restart=on-failure
-    ```
-新建订阅链接文件：`/usr/local/etc/dae/sublist` ，并安装以下模板填写订阅链接，如果只有一个订阅，则保留并填写一个即可。当通过`update-subs.timer` 拉取订阅信息时，会自动建立`sub1`、`sub2`、`sub3` 的订阅文件。
-```yaml
-sub1:https://mysub1.com
-sub2:https://mysub2.com
-sub3:https://mysub3.com
-```
-赋予订阅链接文件 `600` 权限
-```shell
-chmod 0600 /usr/local/etc/dae/sublist
-```
-修改 `config.dae` 中 `subscription` 部分内容为订阅文件
-```yaml
-subscription {
-    # Add your subscription links here.
-    sub1:'file://sub1.sub'
-    sub2:'file://sub2.sub'
-    sub3:'file://sub3.sub'
-}
-```
-启动Timer
-```shell
-systemctl enable --now update-dae-subs.timer
-
-# If you need to renew your subscription immediately or haven't pulled a subscription before
-systemctl start update-dae-subs.service
-```
 
 ## 关于Dae的CPU占用率高及内存泄露
 建议添加如下规则禁止Quic。Daed也建议添加该规则。
@@ -312,7 +221,5 @@ l4proto(udp) && dport(443) -> block
 
 
 ## 参考链接
-> - [官方 Github](https://github.com/daeuniverse/dae/tree/main/docs/zh)
-> - [Dae安装及配置指南](https://deeprouter.org/article/dae-installation-configuration-guide)
-> - [Dae搭配AdGuard Home使用指南](https://deeprouter.org/article/dae-adguard-home-guide)
-> - [DAE搭配MosDNS使用配置](https://deeprouter.org/article/daed-with-mosdns)
+> https://github.com/daeuniverse/dae/tree/main/docs/zh
+> https://deeprouter.org/article/dae-installation-configuration-guide
