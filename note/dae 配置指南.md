@@ -145,12 +145,12 @@ routing {
 
 ## 启用 Dae
 systemctl 启用 \
-`systemctl start Dae`
+`systemctl start dae`
 
 前台启动 Dae，方便查看 Dae 运行情况\
-`/usr/local/bin/dae`
+`/usr/local/bin/dae run -c  /usr/local/etc/dae/config.dae`
 
-修改配置文件后，需要重载Dae配置文件时，可以使用: 
+修改配置文件后，需要重载Dae配置文件时，可以使用:\
 `/usr/local/bin/dae reload`
 
 
