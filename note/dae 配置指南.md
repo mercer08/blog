@@ -100,10 +100,7 @@ group {
 routing {
     pname(NetworkManager) -> direct
     dip(224.0.0.0/3, 'ff00::/8') -> direct
-    dip(geoip:private) -> direct
-    dip(geoip:cn) -> direct
-    domain(geosite:china-list) -> direct
-    domain(geosite:cn) -> direct
+    
     ### AppleCN
     domain(geosite:apple@cn) -> direct
 
@@ -124,8 +121,12 @@ routing {
     ### 小米电视
     domain(suffix: tv.global.mi.com) -> direct(must)
 
-    ### 禁用Quic，避免CPU高负载及内存泄露
+    # 禁用 h3，因为它通常消耗很多 CPU 和内存资源
     l4proto(udp) && dport(443) -> block
+    dip(geoip:private) -> direct
+    dip(geoip:cn) -> direct
+    domain(geosite:cn) -> direct
+    domain(geosite:china-list) -> direct
 
     pname(sing-box) -> must_direct
     
@@ -147,7 +148,7 @@ systemctl 启用 \
 `systemctl start Dae`
 
 前台启动 Dae，方便查看 Dae 运行情况\
-`前台使用Dae，便于查看Dae运行情况，可以使用：`
+`/usr/local/bin/dae`
 
 修改配置文件后，需要重载Dae配置文件时，可以使用: 
 `/usr/local/bin/dae reload`
