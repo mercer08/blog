@@ -17,15 +17,13 @@ export default defineConfig({
         items: [
           { text: 'Dae 配置指南', link: '/note/dae 配置指南' },
           { text: 'Ubuntu 核显直通', link: '/note/ubuntu 核显直通' },
-          { text: 'Markdown Examples', link: '/note/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/note/api-examples' },
           { text: 'Mac mini 外置磁盘升级系统', link: '/note/updateMacOS' },
         ]
       }
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/mercer08' }
     ]
   }
 })
